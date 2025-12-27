@@ -363,21 +363,21 @@
     // ... (Keep the rest of your functions: submit handlers, resizeImage, etc.) ...
 
     // --- 2. SALES LOGIC (Updated Dropdown Format) ---
-    function populateDropdowns() {
-        const sellSelect = document.getElementById('sell-name');
-        const anSelect = document.getElementById('an-item');
-        const currentSell = sellSelect.value;
+    // function populateDropdowns() {
+    //     const sellSelect = document.getElementById('sell-name');
+    //     const anSelect = document.getElementById('an-item');
+    //     const currentSell = sellSelect.value;
 
-        sellSelect.innerHTML = '<option value="">-- Choose Item --</option>';
-        anSelect.innerHTML = '<option value="ALL">All Items</option>';
+    //     sellSelect.innerHTML = '<option value="">-- Choose Item --</option>';
+    //     anSelect.innerHTML = '<option value="ALL">All Items</option>';
 
-        INVENTORY_DATA.forEach(item => {
-            // New Format: Name (Qty Unit)
-            sellSelect.innerHTML += `<option value="${item.name}">${item.name} (${item.qty} ${item.unit})</option>`;
-            anSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
-        });
-        sellSelect.value = currentSell;
-    }
+    //     INVENTORY_DATA.forEach(item => {
+    //         // New Format: Name (Qty Unit)
+    //         sellSelect.innerHTML += `<option value="${item.name}">${item.name} (${item.qty} ${item.unit})</option>`;
+    //         anSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+    //     });
+    //     sellSelect.value = currentSell;
+    // }
 
     document.getElementById('form-sell').addEventListener('submit', async (e) => {
         e.preventDefault();
