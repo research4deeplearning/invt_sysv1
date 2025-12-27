@@ -42,15 +42,23 @@
 </nav>
 
 <div class="container">
-
-    <div id="tab-inventory">
+<div id="tab-inventory">
         <div class="card p-3 mb-3 border-0 shadow-sm">
-            <h5 class="mb-3 text-primary">➕ Add Stock</h5>
+            <h5 class="mb-3 text-primary">➕ Add Stock / Refill</h5>
             <form id="form-add">
+                
+                <div class="mb-2">
+                    <label class="small text-muted">Refill Existing Item?</label>
+                    <select id="in-existing" class="form-select bg-light" onchange="fillAddForm()">
+                        <option value="">-- No, Create New Item --</option>
+                    </select>
+                </div>
+
                 <div class="row g-2">
                     <div class="col-12">
                         <input type="text" id="in-name" class="form-control" placeholder="Item Name" required>
                     </div>
+
                     <div class="col-6">
                         <select id="in-unit" class="form-select">
                             <option value="pcs">Pieces</option>
@@ -59,15 +67,22 @@
                             <option value="m">Meters</option>
                         </select>
                     </div>
+
                     <div class="col-6">
                         <input type="number" id="in-price" class="form-control" placeholder="Cost Price" inputmode="decimal" required>
                     </div>
+
                     <div class="col-12">
                         <div class="input-group">
                             <input type="number" id="in-qty" class="form-control" placeholder="Qty" inputmode="decimal" step="0.01" required>
+                            
                             <input type="file" id="in-file" class="form-control" accept="image/*">
+                            <div id="in-img-preview" class="input-group-text p-0 hidden" style="width: 50px; justify-content: center; overflow: hidden;">
+                                <img id="in-img-tag" src="" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
                         </div>
                     </div>
+
                     <div class="col-12 mt-2">
                         <button type="submit" class="btn btn-primary w-100 fw-bold">Add to Stock</button>
                     </div>
@@ -274,6 +289,78 @@
                 </tr>`;
         });
     }
+
+    // ... (Keep your existing switchTab and loadData functions) ...
+
+    // --- NEW: Handle "Refill" Logic ---
+    function fillAddForm() {
+        const select = document.getElementById('in-existing');
+        const nameInput = document.getElementById('in-name');
+        const unitInput = document.getElementById('in-unit');
+        const fileInput = document.getElementById('in-file');
+        const imgPreview = document.getElementById('in-img-preview');
+        const imgTag = document.getElementById('in-img-tag');
+
+        const selectedName = select.value;
+
+        if (selectedName) {
+            // REFILL MODE
+            const item = INVENTORY_DATA.find(i => i.name === selectedName);
+            
+            // Auto-fill Name & Unit
+            nameInput.value = item.name;
+            unitInput.value = item.unit;
+            
+            // Lock them so user doesn't accidentally change name creating a duplicate
+            nameInput.readOnly = true; 
+            // Optional: disable unit if you want strictly same unit
+            
+            // Hide File Upload, Show Preview
+            fileInput.classList.add('hidden');
+            imgPreview.classList.remove('hidden');
+            imgTag.src = fixDriveLink(item.image);
+        } else {
+            // NEW ITEM MODE
+            nameInput.value = "";
+            nameInput.readOnly = false;
+            
+            fileInput.value = ""; // Clear file
+            fileInput.classList.remove('hidden');
+            imgPreview.classList.add('hidden');
+        }
+    }
+
+    // --- UPDATED: Populate Dropdowns (Now includes the Add Form) ---
+    function populateDropdowns() {
+        const sellSelect = document.getElementById('sell-name');
+        const anSelect = document.getElementById('an-item');
+        const addSelect = document.getElementById('in-existing'); // <--- New
+
+        const currentSell = sellSelect.value;
+        const currentAdd = addSelect.value;
+
+        // Reset Options
+        sellSelect.innerHTML = '<option value="">-- Choose Item --</option>';
+        anSelect.innerHTML = '<option value="ALL">All Items</option>';
+        addSelect.innerHTML = '<option value="">-- No, Create New Item --</option>'; // <--- New
+
+        INVENTORY_DATA.forEach(item => {
+            // Sell Dropdown
+            sellSelect.innerHTML += `<option value="${item.name}">${item.name} (${item.qty} ${item.unit})</option>`;
+            
+            // Analytics Dropdown
+            anSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+            
+            // Add/Refill Dropdown (New)
+            addSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+        });
+
+        // Restore selections if refreshing
+        sellSelect.value = currentSell;
+        if(currentAdd) addSelect.value = currentAdd;
+    }
+
+    // ... (Keep the rest of your functions: submit handlers, resizeImage, etc.) ...
 
     // --- 2. SALES LOGIC (Updated Dropdown Format) ---
     function populateDropdowns() {
